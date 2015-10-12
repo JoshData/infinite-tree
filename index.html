@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- metadata you need to fill in -->
+
+        <title>An Infinite Tree</title>
+
+        <meta name="description" content="An infinite tree.">
+
+        <link rel="icon" type="image/png" href="favicon.ico">
+        <meta property="og:image" content="square.png" />
+
+        <meta name="twitter:creator" content="@JoshData" />
+
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+          }
+          #container > div {
+            width: 100vw;
+            height: 100vh;
+            background-image: url('infinite-tree-1600px.jpeg');
+            background-size: cover;
+            background-position: 0 0;
+          }
+
+          @media (max-width: 1200px) {
+            #container > div {
+              background-image: url('infinite-tree-1200px.jpeg');
+            }
+          }
+          @media (max-width: 1024px) {
+            #container > div {
+              background-image: url('infinite-tree-1024px.jpeg');
+            }
+          }
+          @media (max-width: 768px) {
+            #container > div {
+              background-image: url('infinite-tree-768px.jpeg');
+            }
+          }
+          @media (max-width: 640px) {
+            #container > div {
+              background-image: url('infinite-tree-640px.jpeg');
+            }
+          }
+        </style>
+    </head>
+    <body>
+
+    <!--[if lt IE 8]><p>Internet Explorer version 8 or any modern web browser is required to use this website, sorry.<![endif]-->
+    <!--[if gt IE 7]><!-->
+
+    <div id="container" onmousedown="return false"> <!-- disable click & drag -->
+      <!-- a grid of nine tiles will keep the screen always filled -->
+      <div data-tile-x="0" data-tile-y="0"> </div>
+      <div data-tile-x="1" data-tile-y="0"> </div>
+      <div data-tile-x="2" data-tile-y="0"> </div>
+      <div data-tile-x="0" data-tile-y="1"> </div>
+      <div data-tile-x="1" data-tile-y="1"> </div>
+      <div data-tile-x="2" data-tile-y="1"> </div>
+      <div data-tile-x="0" data-tile-y="2"> </div>
+      <div data-tile-x="1" data-tile-y="2"> </div>
+      <div data-tile-x="2" data-tile-y="2"> </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <script>
+    $(function() {
+      var frame_rate = 1000/32; // i.e. initially 32 frames per second
+      var anim_delta = [.25, -1];
+      var tiles_offset = [0, 0]; // current tile position, pixel offset of the (1,1) tile
+
+      function layout_tiles() {
+        // Lay out the tiles.
+
+        // First get the tile size, which will extend the tile on the side it
+        // was cropped in order to 'cover' the window.
+        var ar = 7143/1675;
+        var w = $(window).width();
+        var h = $(window).height();
+        if (h < parseInt(w*ar))
+          h = parseInt(w*ar);
+        else
+          w = parseInt(h/ar);
+
+        // Keep tiles_offset[0], tiles_offset[1] in bounds --- wrap exactly so that the displayed
+        // image is the same, even though the tiles have moved.
+        if (tiles_offset[0] > w) tiles_offset[0] -= w;
+        if (tiles_offset[0] < -w) tiles_offset[0] += w;
+        if (tiles_offset[1] > h) tiles_offset[1] -= h;
+        if (tiles_offset[1] < -h) tiles_offset[1] += h;
+
+        // Position & size the tiles.
+        $('#container > div').each(function() {
+          $(this).css({
+            position: 'absolute',
+            width: w,
+            height: h,
+            left: w * (parseInt($(this).attr('data-tile-x'))-1) - parseInt(tiles_offset[0]), // round to avoid sub-pixel positions
+            top: h * (parseInt($(this).attr('data-tile-y'))-1) - parseInt(tiles_offset[1])
+          });
+        })
+      }
+
+      layout_tiles();
+
+      function animation_frame() {
+        // adjust the frame rate within the bounds of [10ms, 250ms] so that
+        // each update is a one-pixel move.
+        var md = Math.max(Math.abs(anim_delta[0]), Math.abs(anim_delta[1]));
+        var f = parseInt(frame_rate / md);
+        if (f < 10) f = 10;
+        if (f > 250) f = 250;
+        console.log(anim_delta[0]*f/frame_rate, anim_delta[1]*f/frame_rate)
+
+        tiles_offset[0] += anim_delta[0] * (f/frame_rate);
+        tiles_offset[1] += anim_delta[1] * (f/frame_rate);
+        layout_tiles()
+        setTimeout(animation_frame, f);
+      }
+      animation_frame();
+
+      // adjust animation speed through the scroll wheel
+      $(window).on('wheel', function(e) {
+        anim_delta[0] -= e.originalEvent.deltaX/100;
+        anim_delta[1] += e.originalEvent.deltaY/100;
+      })
+    });
+    </script>
+
+    </body>
+</html>
