@@ -85,8 +85,8 @@
         // First get the tile size, which will extend the tile on the side it
         // was cropped in order to 'cover' the window.
         var ar = 7143/1675;
-        var w = $(window).width();
-        var h = $(window).height();
+        var w = parseInt($(window).innerWidth());
+        var h = parseInt($(window).innerHeight());
         if (h < parseInt(w*ar))
           h = parseInt(w*ar);
         else
@@ -105,6 +105,7 @@
             position: 'absolute',
             width: w,
             height: h,
+            backgroundSize: '100%', // now use regular scaling since 'cover' is choppy on mobile Chrome
             left: w * (parseInt($(this).attr('data-tile-x'))-1) - parseInt(tiles_offset[0]), // round to avoid sub-pixel positions
             top: h * (parseInt($(this).attr('data-tile-y'))-1) - parseInt(tiles_offset[1])
           });
@@ -126,7 +127,7 @@
         layout_tiles()
         setTimeout(animation_frame, f);
       }
-      animation_frame();
+      setTimeout(animation_frame, 500);
 
       // adjust animation speed through the scroll wheel
       $(window).on('wheel', function(e) {
