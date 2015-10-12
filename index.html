@@ -120,7 +120,6 @@
         var f = parseInt(frame_rate / md);
         if (f < 10) f = 10;
         if (f > 250) f = 250;
-        console.log(anim_delta[0]*f/frame_rate, anim_delta[1]*f/frame_rate)
 
         tiles_offset[0] += anim_delta[0] * (f/frame_rate);
         tiles_offset[1] += anim_delta[1] * (f/frame_rate);
